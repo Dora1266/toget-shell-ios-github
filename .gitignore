@@ -1,0 +1,10 @@
+node_modules/
+Pods/
+DerivedData/
+build/
+dist/
+*.log
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+ios/App/App/GoogleService-Info.plist

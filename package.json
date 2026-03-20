@@ -1,0 +1,16 @@
+{
+  "name": "toget-shell-ios-build",
+  "private": true,
+  "version": "0.0.2",
+  "scripts": {
+    "sync:config": "node scripts/sync-shell-config.mjs",
+    "ensure:ios:assets": "bash scripts/ensure-ios-assets.sh",
+    "cap:sync:ios": "npm run sync:config && cap sync ios",
+    "cap:open:ios": "cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/cli": "^6.2.0",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/ios": "^6.2.1"
+  }
+}

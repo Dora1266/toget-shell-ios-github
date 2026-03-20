@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <title>ToGet</title>
+    <style>
+      :root { --bg:#f8f8f7; --fg:#1d1d1f; --muted:rgba(29,29,31,.65); --card:rgba(255,255,255,.82); --border:rgba(0,0,0,.08); --shadow:rgba(0,0,0,.08); --btn:#1f1f23; --btnFg:#fff; --btn2:rgba(0,0,0,.06); --btn2Fg:#1d1d1f; }
+      @media (prefers-color-scheme: dark) { :root { --bg:#272728; --fg:#f2f2f2; --muted:rgba(242,242,242,.72); --card:rgba(0,0,0,.28); --border:rgba(255,255,255,.1); --shadow:rgba(0,0,0,.35); --btn:#f2f2f2; --btnFg:#121212; --btn2:rgba(255,255,255,.12); --btn2Fg:#f2f2f2; } }
+      html,body{height:100%;width:100%;margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC","Helvetica Neue",Arial,sans-serif}
+      .wrap{height:100%;display:flex;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));box-sizing:border-box}
+      .card{width:min(520px,100%);border-radius:18px;background:var(--card);border:1px solid var(--border);padding:22px 18px;box-sizing:border-box;box-shadow:0 14px 36px var(--shadow)}
+      .brand{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+      .logo{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+      .mark{width:44px;height:44px;display:block}
+      .title{font-size:16px;font-weight:750}
+      .h1{font-size:18px;font-weight:760;margin:0 0 8px}
+      .p{margin:0 0 16px;color:var(--muted);line-height:1.55;font-size:14px}
+      .status{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin:0 0 14px}
+      .dot{width:8px;height:8px;border-radius:999px;background:#d24b4b;box-shadow:0 0 0 3px rgba(210,75,75,.12)}
+      .btns{display:flex;gap:10px}
+      button{appearance:none;border:none;border-radius:12px;padding:12px 14px;font-size:14px;font-weight:650;cursor:pointer}
+      .primary{background:var(--btn);color:var(--btnFg)}
+      .secondary{background:var(--btn2);color:var(--btn2Fg);box-shadow:inset 0 0 0 1px var(--border)}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <svg class="mark" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="tg_g" x1="18" y1="10" x2="52" y2="54" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#1F1F23" />
+                  <stop offset="1" stop-color="#35353B" />
+                </linearGradient>
+              </defs>
+              <rect x="4" y="4" width="56" height="56" rx="16" fill="url(#tg_g)" />
+              <path d="M18 22h28v6H35v24h-6V28H18v-6Z" fill="#FFFFFF" fill-rule="evenodd" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="title">ToGet</div>
+        </div>
+        <h1 class="h1">无法加载页面</h1>
+        <div class="status"><span class="dot" aria-hidden="true"></span><span id="statusText">正在检查网络…</span></div>
+        <p class="p">网络不可用或服务暂时不可达。你可以重试，或者稍后再回来。</p>
+        <div class="btns">
+          <button class="primary" id="retryBtn">重试</button>
+          <button class="secondary" id="closeBtn">退出</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const APP_URL = "__TOGET_APP_URL__"
+      try { window.__TOGET_WEB_UI_READY__ = true } catch (e) {}
+      const statusEl = document.getElementById("statusText")
+      const dotEl = document.querySelector(".dot")
+      const retryBtn = document.getElementById("retryBtn")
+      function normalizedAppUrl() {
+        try {
+          const raw = APP_URL.indexOf("__TOGET_APP_URL") === 0 ? "https://toget.chat" : APP_URL
+          const next = new URL(String(raw || "").trim() || "https://toget.chat")
+          if (next.protocol !== "http:" && next.protocol !== "https:") return "https://toget.chat"
+          next.hash = ""
+          return next.toString().replace(/\/$/, "")
+        } catch (e) {
+          return "https://toget.chat"
+        }
+      }
+      function setStatus(ok,text){ try{ if(statusEl) statusEl.textContent=text }catch(e){} try{ if(!dotEl) return; if(ok){ dotEl.style.background="#2fa84f"; dotEl.style.boxShadow="0 0 0 3px rgba(47, 168, 79, 0.12)"; }else{ dotEl.style.background="#d24b4b"; dotEl.style.boxShadow="0 0 0 3px rgba(210, 75, 75, 0.12)"; } }catch(e){} }
+      function hardNavigate(){ try { window.location.href = normalizedAppUrl() } catch (e) {} }
+      retryBtn?.addEventListener("click", hardNavigate)
+      document.getElementById("closeBtn")?.addEventListener("click", function(){ try { window.close() } catch (e) {} })
+      async function probeOnce(){ try{ await fetch(normalizedAppUrl()+"/?_probe="+Date.now(),{mode:"no-cors",cache:"no-store"}); return true }catch(e){ return false } }
+      let attempts=0
+      async function loop(){ attempts++; setStatus(false,"正在检查网络…"); const ok=await probeOnce(); if(ok){ setStatus(true,"网络已恢复，正在重新加载…"); setTimeout(hardNavigate,250); return } setStatus(false,"网络不可用（将自动重试）"); const wait=Math.min(8000,800+attempts*500); setTimeout(loop,wait) }
+      loop()
+    </script>
+  </body>
+</html>
